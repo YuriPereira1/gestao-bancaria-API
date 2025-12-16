@@ -1,27 +1,32 @@
 from dataclasses import dataclass
 
 
-class ErrorTransferencia:
+class Errors:
     pass
 
 
-class ErrorPostTransferencia(ErrorTransferencia):
+class ErrorExecucao(Errors):
     pass
 
 
-class ErrorConta:
-    pass
-
-
-class ErrorPostConta(ErrorConta):
+class ErrorConta(ErrorExecucao):
     pass
 
 
 @dataclass
-class SaldoInsuficiente(ErrorPostTransferencia):
-    mensagem: str
+class ErrorContaNaoExiste(ErrorConta):
+    pass
 
 
 @dataclass
-class ErrorContaNaoExiste(ErrorPostTransferencia):
-    mensagem: str
+class ErrorContaJaExiste(ErrorConta):
+    pass
+
+
+class ErrorSaldo(ErrorExecucao):
+    pass
+
+
+@dataclass
+class ErrorSaldoInsuficiente(ErrorSaldo):
+    pass

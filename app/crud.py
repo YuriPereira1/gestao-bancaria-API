@@ -4,19 +4,23 @@ from sqlalchemy.orm import Session
 from . import schemas, models, errors
 
 
-def get_conta(db: Session, numero_conta: int) -> models.Banco | None:
-    """
-    Pega a conta bancária do usuário pelo ID fornecido.
-    """
+def get_conta(
+    db: Session, numero_conta: int
+) -> models.Banco | errors.ErrorContaNaoExiste:
     query = select(models.Banco).where(models.Banco.numero_conta == numero_conta)
-    return db.execute(query).scalars().first()
+    db_conta = db.execute(query).scalars().first()
+    if not db_conta:
+        return errors.ErrorContaNaoExiste()
+    return db_conta
 
 
-def criar_conta(db: Session, usuario: schemas.CriarConta) -> models.Banco | None:
+def criar_conta(
+    db: Session, usuario: schemas.CriarConta
+) -> models.Banco | errors.ErrorConta:
     db_usuario = models.Banco(**usuario.model_dump())
-    existe_usuario = get_conta(db, db_usuario.numero_conta)
-    if existe_usuario:
-        return None
+    verificar_id_banco = get_conta(db, db_usuario.numero_conta)
+    if isinstance(verificar_id_banco, models.Banco):
+        return errors.ErrorContaJaExiste()
     db.add(db_usuario)
     db.commit()
     db.refresh(db_usuario)
@@ -33,14 +37,14 @@ def get_taxa(tipo: Literal["P", "D", "C"]) -> float:
 
 def transacao_bancaria(
     db: Session, transferencia: schemas.Transferencia
-) -> models.Banco | errors.ErrorPostTransferencia:
-    db_conta: models.Banco | None = get_conta(db, transferencia.numero_conta)
-    if db_conta is None:
-        return errors.ErrorContaNaoExiste(mensagem="A conta não existe")
+) -> models.Banco | errors.ErrorExecucao:
+    db_conta = get_conta(db, transferencia.numero_conta)
+    if isinstance(db_conta, errors.ErrorContaNaoExiste):
+        return db_conta
     taxa = get_taxa(transferencia.tipo_transferencia)
     valor_descontar = transferencia.valor * (taxa + 1)
     if db_conta.saldo < valor_descontar:
-        return errors.SaldoInsuficiente(mensagem="Saldo insuficiente")
+        return errors.ErrorSaldoInsuficiente()
     db_conta.saldo -= valor_descontar
     db.add(db_conta)
     db.commit()

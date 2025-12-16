@@ -1,0 +1,9 @@
+# Source - https://stackoverflow.com/a
+# Posted by gurney alex, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-12-15, License - CC BY-SA 4.0
+
+[MASTER]
+disable=
+    C0114, # missing-module-docstring
+    C0115,
+    C0116

@@ -1,6 +1,5 @@
-from fastapi import Query
+from typing import Literal
 from pydantic import BaseModel, ConfigDict
-from typing import Annotated, Literal
 
 
 class ContaBase(BaseModel):

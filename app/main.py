@@ -7,7 +7,8 @@ models.Base.metadata.create_all(engine)
 app = FastAPI(
     title="API de Sistema Financeiro",
     summary="Crie contas e faça transações",
-    description="API com dois endpoints, podendo criar, acessar informações e requisitar transferência.",
+    description="API com dois endpoints, podendo criar, "
+    "acessar informações e requisitar transferência.",
     version="0.4",
     openapi_tags=routes.tags_metadata,
     contact={

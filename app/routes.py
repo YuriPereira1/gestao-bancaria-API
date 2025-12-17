@@ -24,7 +24,9 @@ tags_metadata = [
     summary="Cria conta",
     description="Rota para criar conta.",
 )
-def criar_conta(conta: Annotated[CriarConta, Body()], db: Session = Depends(get_db)):
+async def criar_conta(
+    conta: Annotated[CriarConta, Body()], db: Session = Depends(get_db)
+):
     crud_response = crud.criar_conta(db, conta)
     if isinstance(crud_response, errors.ErrorContaJaExiste):
         raise HTTPException(
@@ -41,11 +43,8 @@ def criar_conta(conta: Annotated[CriarConta, Body()], db: Session = Depends(get_
     summary="Pega conta",
     description="Busca e retorna uma conta pelo seu id.",
 )
-def get_conta(
-    numero_conta: Annotated[
-        int,
-        Path(),
-    ],
+async def get_conta(
+    numero_conta: Annotated[int, Path()],
     db: Session = Depends(get_db),
 ):
     crud_response = crud.get_conta(db, numero_conta)
@@ -62,9 +61,10 @@ def get_conta(
     status_code=status.HTTP_200_OK,
     tags=["Transação"],
     summary="Transfere saldo",
-    description="Subtrai valor transferido da conta selecionada, jutamente com taxas de tranferência.",
+    description="Subtrai valor transferido da conta selecionada, "
+    "jutamente com taxas de tranferência.",
 )
-def transferir(
+async def transferir(
     transferencia: Annotated[Transferencia, Body()], db: Session = Depends(get_db)
 ):
     crud_response = crud.transacao_bancaria(db, transferencia)

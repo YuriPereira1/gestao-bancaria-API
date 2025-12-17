@@ -1,6 +1,7 @@
 from typing import Literal
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from decimal import Decimal
 from . import schemas, models, errors
 
 
@@ -42,7 +43,7 @@ def transacao_bancaria(
     if isinstance(db_conta, errors.ErrorContaNaoExiste):
         return db_conta
     taxa = get_taxa(transferencia.tipo_transferencia)
-    valor_descontar = transferencia.valor * (taxa + 1)
+    valor_descontar = transferencia.valor * Decimal(taxa + 1)
     if db_conta.saldo < valor_descontar:
         return errors.ErrorSaldoInsuficiente()
     db_conta.saldo -= valor_descontar

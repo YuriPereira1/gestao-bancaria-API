@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Literal, Annotated
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -6,7 +7,7 @@ class ContaBase(BaseModel):
     numero_conta: Annotated[
         int, Field(..., ge=0, description="Numero da conta bancária")
     ]
-    saldo: Annotated[float, Field(..., ge=0, description="Saldo da conta bancária")]
+    saldo: Annotated[Decimal, Field(..., ge=0, description="Saldo da conta bancária")]
 
 
 class CriarConta(ContaBase):
@@ -31,4 +32,4 @@ class Transferencia(BaseModel):
             ..., description="Tipo de transferência bancária, Pix, Débito ou Crédito"
         ),
     ]
-    valor: Annotated[float, Field(..., gt=0, description="Valor da transfêrencia")]
+    valor: Annotated[Decimal, Field(..., gt=0, description="Valor da transfêrencia")]

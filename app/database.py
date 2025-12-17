@@ -1,13 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-DATABASE_URL = "sqlite:///:memory:"
+DATABASE_URL = "postgresql+psycopg://username:password@localhost:5432/banco"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 
-connection = engine.connect()
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=connection)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):

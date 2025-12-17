@@ -1,3 +1,4 @@
+from decimal import Decimal
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import pytest
@@ -28,29 +29,31 @@ app.dependency_overrides[get_db] = override_get_db
 
 
 @pytest.fixture(scope="function")
-def get_client_with_db():
+def client():
     Base.metadata.create_all(bind=connection)
 
-    client = TestClient(app)
-    yield client
+    test_client = TestClient(app)
+    yield test_client
 
     Base.metadata.drop_all(bind=connection)
 
 
-def test_criar_conta(client: TestClient):
+def test_criar_conta(client: TestClient):  # pylint: disable=redefined-outer-name
     resposta = client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
     assert resposta.status_code == status.HTTP_201_CREATED
     data = Conta.model_validate(resposta.json())
 
     assert data.numero_conta == 1
-    assert data.saldo == 100.0
+    assert data.saldo == pytest.approx(100)  # type: ignore[arg-type]
 
     assert isinstance(data.numero_conta, int)
-    assert isinstance(data.saldo, float)
+    assert isinstance(data.saldo, Decimal)
 
 
-def test_nao_pode_criar_conta_duas_vezes(client: TestClient):
+def test_nao_pode_criar_conta_duas_vezes(
+    client: TestClient,
+):  # pylint: disable=redefined-outer-name
     adicionado_ao_banco = client.post(
         "/conta/", json={"numero_conta": 1, "saldo": 100.0}
     )
@@ -60,10 +63,10 @@ def test_nao_pode_criar_conta_duas_vezes(client: TestClient):
     assert resposta.status_code == status.HTTP_400_BAD_REQUEST
     data = Conta.model_validate(adicionado_ao_banco.json())
 
-    assert data.saldo == 100.0
+    assert data.saldo == 100
 
 
-def test_pegar_conta(client: TestClient):
+def test_pegar_conta(client: TestClient):  # pylint: disable=redefined-outer-name
     client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
     numero_conta = 1
@@ -74,19 +77,21 @@ def test_pegar_conta(client: TestClient):
     data = Conta.model_validate(resposta.json())
 
     assert data.numero_conta == 1
-    assert data.saldo == 100.0
+    assert data.saldo == pytest.approx(100)  # type: ignore[arg-type]
 
     assert isinstance(data.numero_conta, int)
-    assert isinstance(data.saldo, float)
+    assert isinstance(data.saldo, Decimal)
 
 
-def test_erro_acessar_conta_inexistente(client: TestClient):
+def test_erro_acessar_conta_inexistente(
+    client: TestClient,
+):  # pylint: disable=redefined-outer-name
     resposta = client.get("/conta/1")
 
     assert resposta.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_saldo_insuficiente(client: TestClient):
+def test_saldo_insuficiente(client: TestClient):  # pylint: disable=redefined-outer-name
     client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
     resposta = client.post(
@@ -98,7 +103,7 @@ def test_saldo_insuficiente(client: TestClient):
 
 
 class TestCadaTipoTransferencia:
-    def test_pix(self, client: TestClient):
+    def test_pix(self, client: TestClient):  # pylint: disable=redefined-outer-name
         client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
         resposta = client.post(
@@ -110,9 +115,9 @@ class TestCadaTipoTransferencia:
 
         data = Conta.model_validate(resposta.json())
 
-        assert data.saldo == 0
+        assert data.saldo == pytest.approx(0)  # type: ignore
 
-    def test_debito(self, client: TestClient):
+    def test_debito(self, client: TestClient):  # pylint: disable=redefined-outer-name
         client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
         resposta = client.post(
@@ -124,9 +129,9 @@ class TestCadaTipoTransferencia:
 
         data = Conta.model_validate(resposta.json())
 
-        assert data.saldo == pytest.approx(7.3)  # type: ignore[arg-type]
+        assert data.saldo == pytest.approx(Decimal(7.3))  # type: ignore[arg-type]
 
-    def test_credito(self, client: TestClient):
+    def test_credito(self, client: TestClient):  # pylint: disable=redefined-outer-name
         client.post("/conta/", json={"numero_conta": 1, "saldo": 100.0})
 
         resposta = client.post(

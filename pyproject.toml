@@ -1,0 +1,16 @@
+[project]
+name = "gestao-bancaria-api"
+version = "0.5"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.124.4",
+    "psycopg>=3.3.2",
+    "sqlalchemy>=2.0.45",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

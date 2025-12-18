@@ -8,13 +8,11 @@ from app.main import app
 from app.database import get_db, Base
 from app.schemas import Conta
 
-DATABASE_URL = "sqlite:///:memory:"
+DATABASE_URL = "postgresql+psycopg://username:password@localhost:5432/banco"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 
-connection = engine.connect()
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=connection)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def override_get_db():
@@ -30,12 +28,12 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="function")
 def client():
-    Base.metadata.create_all(bind=connection)
+    Base.metadata.create_all(bind=engine)
 
     test_client = TestClient(app)
     yield test_client
 
-    Base.metadata.drop_all(bind=connection)
+    Base.metadata.drop_all(bind=engine)
 
 
 def test_criar_conta(client: TestClient):  # pylint: disable=redefined-outer-name

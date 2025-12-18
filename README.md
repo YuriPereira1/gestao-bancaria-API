@@ -14,11 +14,13 @@ Clone o repositório:
 
 `git clone git@github.com:YuriPereira1/gestao-bancaria-API.git`
 
-```sh
-cd gestao_bancaria_api
-cp .env.example .env
 ```
+cd gestao_bancaria_api
+```
+
 Copie o arquivo de exemplo de variáveis de ambiente:
+
+`cp .env.example .env`
 
 Suba os containers com Docker Compose:
 
@@ -40,7 +42,7 @@ Se precisar resetar o banco (limpar dados), execute:
 
 Para parar os containers sem remover volumes:
 
-docker compose down
+`docker compose down`
 
 
 Se quiser parar todos os containers do Docker:

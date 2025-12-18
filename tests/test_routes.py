@@ -8,7 +8,7 @@ from app.main import app
 from app.database import get_db, Base
 from app.schemas import Conta
 
-DATABASE_URL = "postgresql+psycopg://username:password@localhost:5432/banco"
+DATABASE_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/app_db_test"
 
 engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 
@@ -23,6 +23,7 @@ def override_get_db():
         db.close()
 
 
+app.dependency_overrides.clear()
 app.dependency_overrides[get_db] = override_get_db
 
 
@@ -30,8 +31,8 @@ app.dependency_overrides[get_db] = override_get_db
 def client():
     Base.metadata.create_all(bind=engine)
 
-    test_client = TestClient(app)
-    yield test_client
+    with TestClient(app) as test_client:
+        yield test_client
 
     Base.metadata.drop_all(bind=engine)
 

@@ -1,16 +1,19 @@
-## 🏦 Gestão Bancária API
+## 🏦 Banking Management API
 
-API em FastAPI + SQLAlchemy + PostgreSQL, pronta para rodar via Docker.
+A FastAPI + SQLAlchemy + PostgreSQL API, ready to run using Docker.
 
-## 📋 Pré-requisitos
+---
 
-Docker e Docker Compose (já vem com Docker recente)
+## 📋 Prerequisites
 
-Nenhuma instalação de Python ou PostgreSQL é necessária localmente.
+- Docker and Docker Compose (included in recent Docker versions)
+
+No local installation of Python or PostgreSQL is required.
 
 ## ⚙️ Setup
 
-Clone o repositório:
+
+Clone the repository:
 
 `git clone git@github.com:YuriPereira1/gestao-bancaria-API.git`
 
@@ -18,33 +21,33 @@ Clone o repositório:
 cd gestao_bancaria_api
 ```
 
-Copie o arquivo de exemplo de variáveis de ambiente:
+Copy the example environment variables file:
 
 `cp .env.example .env`
 
-Suba os containers com Docker Compose:
+Start the containers using Docker Compose:
 
 `docker compose up --build`
 
-Acesse a documentação da API no navegador:
+Access the API documentation in your browser:
 
 http://0.0.0.0:8000/docs
 
 
-## ⚠️ Observações
+## ⚠️ Notes
 
-Caso o banco já esteja em uso na porta 5432 do host, você pode remover a exposição da porta do docker-compose.yml.
+If the database port 5432 is already in use on your host machine, you can remove the port exposure from the `docker-compose.yml` file.
 
-Se precisar resetar o banco (limpar dados), execute:
+To reset the database (remove all data), run:
 
 `docker compose down -v`
 
 
-Para parar os containers sem remover volumes:
+To stop the containers without removing volumes:
 
 `docker compose down`
 
 
-Se quiser parar todos os containers do Docker:
+To stop all running Docker containers on your system:
 
 `docker stop $(docker ps -q)`
